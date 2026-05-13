@@ -31,7 +31,7 @@ const stickers = [
   { id: 4, image: Sticker, title: "Designer", path: "/Designer", tagline: "Iconic Scents" },
 ];
 
-// Mobile Image Slider Component
+// Mobile Image Slider Component - ONLY visible on mobile
 const MobileImageSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -85,13 +85,13 @@ const MobileImageSlider = () => {
   return (
     <Box
       sx={{
-        display: { xs: 'block', md: 'none' },
+        display: { xs: 'block', md: 'none' }, // Only shows on mobile
         position: 'relative',
         top: 0,
         left: 0,
         right: 0,
         zIndex: 1,
-        mt: -10,
+        mt: -12,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -350,7 +350,7 @@ const Home = () => {
           overflow: 'visible',
           pt: { xs: 0, md: 6 },
           pb: { xs: 0, md: 4 },
-          display: { xs: 'none', md: 'block' },
+          display: { xs: 'none', md: 'block' }, // Hidden on mobile
           backgroundColor: colors.white,
         }}
       >
@@ -596,7 +596,7 @@ const Home = () => {
         </Container>
       </Box>
 
-      {/* Products Grid Section */}
+      {/* Products Grid Section - HIDDEN completely on mobile */}
       <Box
         sx={{
           mx: { xs: 2, sm: 3, md: 5 },
@@ -609,6 +609,7 @@ const Home = () => {
           position: 'relative',
           zIndex: 5,
           boxShadow: `0 8px 30px rgba(0,0,0,0.05)`,
+          display: { xs: 'none', md: 'block' }, // COMPLETELY HIDDEN on mobile
         }}
       >
         <Container maxWidth="xl">
