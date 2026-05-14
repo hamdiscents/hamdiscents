@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, Button, Container, IconButton } from '@mui/material';
+import { Box, Grid, Typography, Button, Container, IconButton, Card, CardMedia, CardContent, Chip, Stack, Divider, FormControl, Select, MenuItem, alpha } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowForward, AutoAwesome, ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { ArrowForward, ChevronLeft, ChevronRight, ShoppingBag, Male as MaleIcon, Female as FemaleIcon, People as PeopleIcon, CheckCircle as CheckCircleIcon, RemoveCircle as RemoveCircleIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import api from '../services/api';
 import NB from '../assets/Frag.png';
 import Poster from '../assets/Frag2.png';
 import Jar from '../assets/Frag3.png';
 import BM from '../assets/Frag4.png';
 import Sticker from '../assets/Frag5.png';
-import hangingImage from '../assets/Frag.png';
 
 // ======================
 // THEME COLORS
@@ -90,7 +90,7 @@ const FullWidthSlider = () => {
         width: '100%',
         height: { xs: '80vh', sm: '80vh', md: '90vh' },
         overflow: 'hidden',
-        mt: { xs: -26, md: -24, lg:-14 },
+        mt: { xs: -26, md: -24, lg: -14 },
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -130,6 +130,7 @@ const FullWidthSlider = () => {
                 src={slides[currentSlide].image}
                 alt={slides[currentSlide].title}
                 sx={{
+                  mt: { xs: 12},
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
@@ -223,7 +224,7 @@ const FullWidthSlider = () => {
                     }}
                   >
                     Shop Now
-                    <ArrowForward sx={{ ml: 1, fontSize: '1.1rem' }} />
+                    <ArrowForward sx={{ ml: 1, fontSize: '1.1rem', }} />
                   </Button>
                 </motion.div>
               </Box>
@@ -238,7 +239,7 @@ const FullWidthSlider = () => {
         sx={{
           position: 'absolute',
           left: 16,
-          top: '50%',
+          top: {xs: '70%', sm: '70%', md: '50%', lg: '50%'},
           transform: 'translateY(-50%)',
           bgcolor: 'rgba(255,255,255,0.15)',
           color: colors.white,
@@ -261,7 +262,7 @@ const FullWidthSlider = () => {
         sx={{
           position: 'absolute',
           right: 16,
-          top: '50%',
+          top: {xs: '70%', sm: '70%', md: '50%', lg: '50%'},
           transform: 'translateY(-50%)',
           bgcolor: 'rgba(255,255,255,0.15)',
           color: colors.white,
@@ -310,10 +311,210 @@ const FullWidthSlider = () => {
   );
 };
 
-// Product Section Component
+// Enhanced Product Card Component
+const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSizeChange }) => {
+  const { addToCart } = useCart();
+  const [localSelectedSize, setLocalSelectedSize] = useState(selectedSize || product.sizes?.[0]);
+
+  const getGenderIcon = (gender) => {
+    if (gender === 'Men') return <MaleIcon sx={{ fontSize: 14 }} />;
+    if (gender === 'Women') return <FemaleIcon sx={{ fontSize: 14 }} />;
+    return <PeopleIcon sx={{ fontSize: 14 }} />;
+  };
+
+  const getStockStatus = () => {
+    const hasStock = product.sizes?.some(size => size.stock > 0);
+    if (hasStock) {
+      return { label: 'In Stock', icon: <CheckCircleIcon sx={{ fontSize: 12, color: '#4caf50' }} />, color: '#4caf50' };
+    }
+    return { label: 'Out of Stock', icon: <RemoveCircleIcon sx={{ fontSize: 12, color: '#f44336' }} />, color: '#f44336' };
+  };
+
+  const handleSizeChange = (newSize) => {
+    setLocalSelectedSize(newSize);
+    if (onSizeChange) onSizeChange(product._id, newSize);
+  };
+
+  const handleAddToCartClick = (e) => {
+    e.stopPropagation();
+    if (localSelectedSize && localSelectedSize.stock > 0) {
+      addToCart(product, localSelectedSize, 1);
+    }
+    if (onAddToCart) onAddToCart(product);
+  };
+
+  const currentSize = localSelectedSize || product.sizes?.[0];
+  const stockStatus = getStockStatus();
+
+  return (
+    <motion.div
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card sx={{ 
+        borderRadius: '16px', 
+        overflow: 'hidden', 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+        },
+      }}>
+        <Box 
+          sx={{ position: 'relative', cursor: 'pointer' }} 
+          onClick={() => onViewDetails(product)}
+        >
+          <CardMedia
+            component="img"
+            height={240}
+            image={product.mainImage}
+            alt={product.name}
+            sx={{ objectFit: 'cover', width: '100%' }}
+          />
+          {product.isBestSeller && (
+            <Chip
+              label="Bestseller"
+              size="small"
+              sx={{ 
+                position: 'absolute', 
+                top: 8, 
+                left: 8, 
+                bgcolor: colors.accentGold, 
+                color: colors.black, 
+                fontWeight: 700,
+                fontSize: '0.65rem',
+                height: 22,
+              }}
+            />
+          )}
+        </Box>
+        
+        <CardContent sx={{ flexGrow: 1, p: 1.5 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
+            <Chip
+              icon={getGenderIcon(product.gender)}
+              label={product.gender || 'Unisex'}
+              size="small"
+              sx={{ 
+                bgcolor: alpha(colors.black, 0.05), 
+                color: colors.black,
+                fontSize: '0.65rem',
+                height: 22,
+              }}
+            />
+            <Chip
+              icon={stockStatus.icon}
+              label={stockStatus.label}
+              size="small"
+              sx={{ 
+                bgcolor: alpha(stockStatus.color, 0.1), 
+                color: stockStatus.color,
+                fontSize: '0.65rem',
+                height: 22,
+              }}
+            />
+          </Stack>
+
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              fontWeight: 700, 
+              color: colors.black, 
+              mt: 1,
+              mb: 0.5,
+              fontSize: '1rem',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {product.name}
+          </Typography>
+
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: '#666', 
+              display: 'block',
+              mb: 1.5,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              minHeight: 32,
+            }}
+          >
+            {product.shortDescription || product.description?.substring(0, 80) || 'No description available'}
+          </Typography>
+
+          <Divider sx={{ my: 1 }} />
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+            <FormControl size="small" sx={{ minWidth: 80 }}>
+              <Select
+                value={currentSize?.size || ''}
+                onChange={(e) => {
+                  const newSize = product.sizes.find(s => s.size === e.target.value);
+                  if (newSize) handleSizeChange(newSize);
+                }}
+                sx={{ 
+                  fontSize: '0.75rem',
+                  height: 32,
+                  '& .MuiSelect-select': { py: 0.5 },
+                }}
+              >
+                {product.sizes?.map((size) => (
+                  <MenuItem key={size.size} value={size.size}>
+                    {size.size}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Typography variant="h6" sx={{ fontWeight: 900, color: colors.black, fontSize: '1.2rem' }}>
+              {currentSize?.price || 0} TND
+            </Typography>
+          </Stack>
+
+          <Button
+            fullWidth
+            variant="contained"
+            size="medium"
+            startIcon={<ShoppingBag />}
+            onClick={handleAddToCartClick}
+            disabled={!currentSize || currentSize.stock === 0}
+            sx={{
+              bgcolor: colors.navyDark,
+              color: colors.white,
+              borderRadius: '50px',
+              textTransform: 'none',
+              fontWeight: 600,
+              py: 0.75,
+              '&:hover': { 
+                bgcolor: colors.accentGold, 
+                color: colors.black,
+              },
+              '&.Mui-disabled': {
+                bgcolor: alpha(colors.black, 0.3),
+                color: colors.white,
+              },
+            }}
+          >
+            Add to Cart
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Product Section Component with Enhanced Cards
 const ProductSection = ({ title, category, viewAllPath, isLast = false }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCardSize, setSelectedCardSize] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -325,11 +526,30 @@ const ProductSection = ({ title, category, viewAllPath, isLast = false }) => {
       setLoading(true);
       const response = await api.get(`/products?category=${category}&limit=4`);
       setProducts(response.data.products.slice(0, 4));
+      
+      const initialSizes = {};
+      response.data.products.slice(0, 4).forEach(product => {
+        if (product.sizes && product.sizes.length > 0) {
+          initialSizes[product._id] = product.sizes[0];
+        }
+      });
+      setSelectedCardSize(initialSizes);
     } catch (error) {
       console.error(`Error fetching ${category} products:`, error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSizeChange = (productId, size) => {
+    setSelectedCardSize(prev => ({
+      ...prev,
+      [productId]: size
+    }));
+  };
+
+  const handleViewDetails = (product) => {
+    navigate(`/product/${product.slug}`);
   };
 
   if (loading) {
@@ -370,61 +590,12 @@ const ProductSection = ({ title, category, viewAllPath, isLast = false }) => {
       <Grid container spacing={3}>
         {products.map((product) => (
           <Grid size={{ xs: 6, sm: 6, md: 3 }} key={product._id}>
-            <motion.div
-              whileHover={{ y: -5 }}
-              transition={{ duration: 0.3 }}
-            >
-              <Box
-                sx={{
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  bgcolor: colors.white,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                  },
-                }}
-                onClick={() => navigate(`/product/${product.slug}`)}
-              >
-                <Box
-                  component="img"
-                  src={product.mainImage}
-                  alt={product.name}
-                  sx={{
-                    width: '100%',
-                    height: { xs: 180, sm: 200, md: 220 },
-                    objectFit: 'cover',
-                  }}
-                />
-                <Box sx={{ p: 1.5 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 700,
-                      color: colors.navyDark,
-                      mb: 0.5,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 800,
-                      color: colors.accentGold,
-                      fontSize: '1rem',
-                    }}
-                  >
-                    From {Math.min(...product.sizes.map(s => s.price))} TND
-                  </Typography>
-                </Box>
-              </Box>
-            </motion.div>
+            <ProductCard
+              product={product}
+              onViewDetails={handleViewDetails}
+              selectedSize={selectedCardSize[product._id]}
+              onSizeChange={handleSizeChange}
+            />
           </Grid>
         ))}
       </Grid>
