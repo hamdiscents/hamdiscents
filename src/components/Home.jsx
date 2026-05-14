@@ -88,9 +88,9 @@ const FullWidthSlider = () => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: { xs: '100vh', sm: '80vh', md: '90vh' },
+        height: { xs: '80vh', sm: '80vh', md: '90vh' },
         overflow: 'hidden',
-        mt: { xs: -12, md: -18, lg:-14 },
+        mt: { xs: -26, md: -24, lg:-14 },
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
