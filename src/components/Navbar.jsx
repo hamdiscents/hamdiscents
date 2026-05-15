@@ -330,7 +330,7 @@ const Navbar = () => {
                     variant="h5" 
                     sx={{ 
                       fontWeight: 900,
-                      color: colors.navyBlue,
+                      color: colors.black,
                       letterSpacing: '1px',
                       fontFamily: "'Montserrat', sans-serif",
                       whiteSpace: 'nowrap',
