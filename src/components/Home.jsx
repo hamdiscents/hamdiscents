@@ -17,7 +17,7 @@ import Sticker from '../assets/Frag5.png';
 const colors = {
   navyDark: '#0a1928',
   navyLight: '#1e3a5f',
-  navyGlow: '#1e3a5f',
+  navyGlow: '#305789',
   white: '#ffffff',
   black: '#000000',
   grayLight: '#f5f5f5',
@@ -311,10 +311,11 @@ const FullWidthSlider = () => {
   );
 };
 
-// Enhanced Product Card Component
+// Enhanced Product Card Component - Professional Luxury Design
 const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSizeChange }) => {
   const { addToCart } = useCart();
   const [localSelectedSize, setLocalSelectedSize] = useState(selectedSize || product.sizes?.[0]);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const getGenderIcon = (gender) => {
     if (gender === 'Men') return <MaleIcon sx={{ fontSize: 14 }} />;
@@ -348,112 +349,203 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.4, ease: [0.23, 1, 0.320, 1] }}
     >
       <Card sx={{ 
-        borderRadius: '16px', 
+        borderRadius: '12px', 
         overflow: 'hidden', 
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column',
-        transition: 'all 0.3s ease',
+        background: colors.white,
+        border: `1px solid ${alpha(colors.navyDark, 0.08)}`,
+        transition: 'all 0.5s cubic-bezier(0.23, 1, 0.320, 1)',
         '&:hover': {
-          boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+          boxShadow: '0 24px 48px rgba(10, 25, 40, 0.12), 0 12px 24px rgba(115, 167, 246, 0.08)',
+          borderColor: alpha(colors.accentGold, 0.3),
         },
       }}>
+        {/* Image Container with Overlay Effects */}
         <Box 
-          sx={{ position: 'relative', cursor: 'pointer' }} 
+          sx={{ 
+            position: 'relative', 
+            cursor: 'pointer',
+            overflow: 'hidden',
+            bg: colors.grayLight,
+            aspectRatio: '1/1.2',
+          }} 
           onClick={() => onViewDetails(product)}
         >
-          <CardMedia
-            component="img"
-            height={240}
-            image={product.mainImage}
-            alt={product.name}
-            sx={{ objectFit: 'cover', width: '100%' }}
-          />
-          {product.isBestSeller && (
-            <Chip
-              label="Bestseller"
-              size="small"
+          <motion.div
+            initial={{ scale: 1 }}
+            whileHover={{ scale: 1.08 }}
+            transition={{ duration: 0.6 }}
+            style={{ width: '100%', height: '100%' }}
+          >
+            <CardMedia
+              component="img"
+              image={product.mainImage}
+              alt={product.name}
+              onLoad={() => setImageLoaded(true)}
               sx={{ 
-                position: 'absolute', 
-                top: 8, 
-                left: 8, 
-                bgcolor: colors.accentGold, 
-                color: colors.black, 
-                fontWeight: 700,
-                fontSize: '0.65rem',
-                height: 22,
+                objectFit: 'cover', 
+                width: '100%',
+                height: '100%',
+                transition: 'opacity 0.3s ease',
+                opacity: imageLoaded ? 1 : 0.7,
               }}
             />
+          </motion.div>
+
+          {/* Premium Overlay Gradient */}
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(135deg, ${alpha(colors.navyDark, 0)} 0%, ${alpha(colors.navyDark, 0.15)} 100%)`,
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Bestseller Badge - Premium Style */}
+          {product.isBestSeller && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: 12,
+                  right: 12,
+                  bgcolor: colors.accentGold,
+                  color: colors.black,
+                  fontWeight: 800,
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  px: 2.5,
+                  py: 0.75,
+                  borderRadius: '4px',
+                  boxShadow: '0 4px 12px rgba(115, 167, 246, 0.25)',
+                  fontFamily: "'Amaranth', sans-serif",
+                }}
+              >
+                Bestseller
+              </Box>
+            </motion.div>
           )}
+
+          {/* Stock Status Badge - Subtle Positioning */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 12,
+                left: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.6,
+                bgcolor: alpha(colors.white, 0.95),
+                backdropFilter: 'blur(8px)',
+                px: 1.5,
+                py: 0.6,
+                borderRadius: '4px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              {stockStatus.icon}
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: stockStatus.color }}>
+                {stockStatus.label}
+              </Typography>
+            </Box>
+          </motion.div>
         </Box>
         
-        <CardContent sx={{ flexGrow: 1, p: 1.5 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
+        {/* Content Section - Premium Typography & Spacing */}
+        <CardContent sx={{ 
+          flexGrow: 1, 
+          p: 2.5,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}>
+          {/* Gender Badge - Refined */}
+          <Box>
             <Chip
               icon={getGenderIcon(product.gender)}
               label={product.gender || 'Unisex'}
               size="small"
               sx={{ 
-                bgcolor: alpha(colors.black, 0.05), 
-                color: colors.black,
-                fontSize: '0.65rem',
-                height: 22,
+                bgcolor: alpha(colors.navyDark, 0.06), 
+                color: colors.navyDark,
+                fontSize: '0.7rem',
+                fontWeight: 600,
+                height: 24,
+                border: `1px solid ${alpha(colors.navyDark, 0.12)}`,
+                '& .MuiChip-icon': {
+                  color: 'inherit',
+                  marginRight: '4px',
+                },
               }}
             />
-            <Chip
-              icon={stockStatus.icon}
-              label={stockStatus.label}
-              size="small"
+          </Box>
+
+          {/* Product Name - Elegant Typography */}
+          <Box>
+            <Typography 
+              variant="body1" 
               sx={{ 
-                bgcolor: alpha(stockStatus.color, 0.1), 
-                color: stockStatus.color,
-                fontSize: '0.65rem',
-                height: 22,
+                fontWeight: 700, 
+                color: colors.navyDark,
+                fontSize: '1.05rem',
+                lineHeight: 1.3,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                fontFamily: "'Amaranth', sans-serif",
+                letterSpacing: '0.01em',
               }}
-            />
-          </Stack>
+            >
+              {product.name}
+            </Typography>
+          </Box>
 
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              fontWeight: 700, 
-              color: colors.black, 
-              mt: 1,
-              mb: 0.5,
-              fontSize: '1rem',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {product.name}
-          </Typography>
-
+          {/* Description - Refined Text */}
           <Typography 
             variant="caption" 
             sx={{ 
-              color: '#666', 
-              display: 'block',
-              mb: 1.5,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
+              color: alpha(colors.black, 0.65),
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
-              minHeight: 32,
+              overflow: 'hidden',
+              fontSize: '0.8rem',
+              lineHeight: 1.5,
+              fontWeight: 500,
             }}
           >
-            {product.shortDescription || product.description?.substring(0, 80) || 'No description available'}
+            {product.shortDescription || product.description?.substring(0, 80) || 'Exquisite fragrance'}
           </Typography>
 
-          <Divider sx={{ my: 1 }} />
+          {/* Divider - Subtle Accent */}
+          <Divider sx={{ 
+            my: 0.5, 
+            borderColor: alpha(colors.accentGold, 0.2),
+            borderWidth: 1,
+          }} />
 
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-            <FormControl size="small" sx={{ minWidth: 80 }}>
+          {/* Size & Price Section */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
+            <FormControl size="small" sx={{ minWidth: 90 }}>
               <Select
                 value={currentSize?.size || ''}
                 onChange={(e) => {
@@ -461,49 +553,104 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
                   if (newSize) handleSizeChange(newSize);
                 }}
                 sx={{ 
-                  fontSize: '0.75rem',
-                  height: 32,
-                  '& .MuiSelect-select': { py: 0.5 },
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  height: 36,
+                  borderRadius: '6px',
+                  border: `1px solid ${alpha(colors.navyDark, 0.15)}`,
+                  '& .MuiSelect-select': { 
+                    py: 1,
+                    px: 1.5,
+                  },
+                  '&:hover': {
+                    borderColor: colors.accentGold,
+                  },
+                  '&.Mui-focused': {
+                    borderColor: colors.accentGold,
+                    boxShadow: `0 0 0 3px ${alpha(colors.accentGold, 0.1)}`,
+                  },
                 }}
               >
                 {product.sizes?.map((size) => (
-                  <MenuItem key={size.size} value={size.size}>
+                  <MenuItem key={size.size} value={size.size} sx={{ fontSize: '0.85rem' }}>
                     {size.size}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            <Typography variant="h6" sx={{ fontWeight: 900, color: colors.black, fontSize: '1.2rem' }}>
-              {currentSize?.price || 0} TND
-            </Typography>
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography 
+                sx={{ 
+                  fontWeight: 800, 
+                  color: colors.accentGold,
+                  fontSize: '1.4rem',
+                  lineHeight: 1,
+                  fontFamily: "'Amaranth', sans-serif",
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {currentSize?.price || 0}
+              </Typography>
+              <Typography sx={{ fontSize: '0.7rem', color: alpha(colors.black, 0.6), fontWeight: 600, mt: 0.3 }}>
+                TND
+              </Typography>
+            </Box>
           </Stack>
 
-          <Button
-            fullWidth
-            variant="contained"
-            size="medium"
-            startIcon={<ShoppingBag />}
-            onClick={handleAddToCartClick}
-            disabled={!currentSize || currentSize.stock === 0}
-            sx={{
-              bgcolor: colors.navyDark,
-              color: colors.white,
-              borderRadius: '50px',
-              textTransform: 'none',
-              fontWeight: 600,
-              py: 0.75,
-              '&:hover': { 
-                bgcolor: colors.accentGold, 
-                color: colors.black,
-              },
-              '&.Mui-disabled': {
-                bgcolor: alpha(colors.black, 0.3),
+          {/* Add to Cart Button - Premium Action */}
+          <motion.div style={{ width: '100%' }}>
+            <Button
+              fullWidth
+              variant="contained"
+              size="medium"
+              startIcon={<ShoppingBag sx={{ fontSize: '1.1rem' }} />}
+              onClick={handleAddToCartClick}
+              disabled={!currentSize || currentSize.stock === 0}
+              sx={{
+                bgcolor: colors.navyDark,
                 color: colors.white,
-              },
-            }}
-          >
-            Add to Cart
-          </Button>
+                borderRadius: '6px',
+                textTransform: 'uppercase',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                letterSpacing: '0.08em',
+                py: 1.2,
+                transition: 'all 0.4s cubic-bezier(0.23, 1, 0.320, 1)',
+                fontFamily: "'Amaranth', sans-serif",
+                border: `2px solid ${colors.navyDark}`,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  bgcolor: colors.navyGlow,
+                  transition: 'left 0.4s ease',
+                  zIndex: -1,
+                },
+                '&:hover:not(.Mui-disabled)': {
+                  color: colors.white,
+                  borderColor: colors.white,
+                  bgcolor: colors.accentGold,
+                  boxShadow: '0 8px 20px rgba(115, 167, 246, 0.25)',
+                  '&::before': {
+                    left: 0,
+                  },
+                },
+                '&.Mui-disabled': {
+                  bgcolor: alpha(colors.black, 0.25),
+                  color: colors.white,
+                  borderColor: alpha(colors.black, 0.25),
+                  cursor: 'not-allowed',
+                },
+              }}
+            >
+              Add
+            </Button>
+          </motion.div>
         </CardContent>
       </Card>
     </motion.div>
