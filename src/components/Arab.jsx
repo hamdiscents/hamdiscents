@@ -288,7 +288,7 @@ const Arab = () => {
               cursor: 'pointer',
               overflow: 'hidden',
               bg: colors.grayLight,
-              aspectRatio: '1/1.25',
+              aspectRatio: '1/1.5',
             }} 
             onClick={() => onViewDetails(product)}
           >
