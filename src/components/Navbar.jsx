@@ -313,11 +313,11 @@ const Navbar = () => {
                     variant="caption"
                     sx={{
                       color: colors.black,
-                      fontSize: '0.4rem',
+                      fontSize: '0.35rem',
                       fontWeight: 600,
                       letterSpacing: '0.5px',
                       fontFamily: "'Montserrat', sans-serif",
-                      mt: 0,
+                      mt: -1.7,
                     }}
                   >
                     MENU

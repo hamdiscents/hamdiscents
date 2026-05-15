@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Box, Grid, Typography, Button, Container, IconButton, Card, CardMedia, CardContent, Chip, Stack, Divider, FormControl, Select, MenuItem, alpha } from '@mui/material';
+import { Box, Grid, Typography, Button, Container, IconButton, Card, CardMedia, CardContent, Chip, Stack, Divider, FormControl, Select, MenuItem, alpha, useMediaQuery, useTheme } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowForward, ChevronLeft, ChevronRight, ShoppingBag, Male as MaleIcon, Female as FemaleIcon, People as PeopleIcon, CheckCircle as CheckCircleIcon, RemoveCircle as RemoveCircleIcon } from '@mui/icons-material';
+import { ArrowForward, ChevronLeft, ChevronRight, ShoppingBag, Male as MaleIcon, Female as FemaleIcon, People as PeopleIcon, CheckCircle as CheckCircleIcon, RemoveCircle as RemoveCircleIcon, AddShoppingCart } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import api from '../services/api';
@@ -22,6 +22,11 @@ const colors = {
   black: '#000000',
   grayLight: '#f5f5f5',
   accentGold: '#73a7f6',
+};
+
+// Helper function to format price with 3 decimals
+const formatPrice = (price) => {
+  return price.toFixed(3);
 };
 
 // Stickers data for slider
@@ -346,6 +351,7 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
 
   const currentSize = localSelectedSize || product.sizes?.[0];
   const stockStatus = getStockStatus();
+  const formattedPrice = formatPrice(currentSize?.price || 0);
 
   return (
     <motion.div
@@ -415,7 +421,39 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
             }}
           />
 
-          {/* Stock Status Badge with Gender - Subtle Positioning */}
+          {/* Shopping Cart Icon on Top Right - For BOTH Mobile and Web */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1 }}
+          >
+            <IconButton
+              onClick={handleAddToCartClick}
+              disabled={!currentSize || currentSize.stock === 0}
+              sx={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                bgcolor: alpha(colors.white, 0.9),
+                backdropFilter: 'blur(8px)',
+                width: { xs: 40, sm: 40, md: 42 },
+                height: { xs: 40, sm: 40, md: 42 },
+                '&:hover': {
+                  bgcolor: colors.accentGold,
+                  color: colors.white,
+                },
+                '&.Mui-disabled': {
+                  bgcolor: alpha(colors.black, 0.5),
+                  color: colors.white,
+                },
+                zIndex: 2,
+              }}
+            >
+              <AddShoppingCart sx={{ fontSize: { xs: 20, md: 22 } }} />
+            </IconButton>
+          </motion.div>
+
+          {/* Gender Badge - Subtle Positioning */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -473,7 +511,7 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
             </Typography>
           </Box>
 
-          {/* Size Selection - Horizontal Buttons on Mobile */}
+          {/* Size Selection - Horizontal Buttons */}
           <Box>
             <Stack direction="row" spacing={0.75} sx={{ flexWrap: 'wrap', gap: 0.75 }}>
               {product.sizes?.map((size) => (
@@ -510,75 +548,41 @@ const ProductCard = ({ product, onAddToCart, onViewDetails, selectedSize, onSize
             </Stack>
           </Box>
 
-          {/* Price Display - Dynamic - Bigger on Mobile, Under Size */}
+          {/* Price Display - Formatted with 3 decimals, TND very small, with glow animation */}
           <Box sx={{ textAlign: 'left', mt: { xs: 0.5, md: 0 } }}>
-            <Typography 
-              sx={{ 
-                fontWeight: 900, 
-                color: colors.black,
-                fontSize: { xs: '1.65rem', sm: '1.65rem', md: '1.4rem' },
-                lineHeight: 1,
-                fontFamily: "'Montserrat', sans-serif",
-                letterSpacing: '0.02em',
+            <motion.div
+              animate={{
+                color: '#171717',
               }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              style={{ display: 'inline-block' }}
             >
-              {currentSize?.price || 0} <span style={{ fontSize: '0.45em', fontWeight: 700, marginLeft: '4px', color: colors.black }}>TND</span>
-            </Typography>
+              <Typography 
+                sx={{ 
+                  fontWeight: 900, 
+                  fontSize: { xs: '1.65rem', sm: '1.65rem', md: '1.4rem' },
+                  lineHeight: 1,
+                  fontFamily: "'Montserrat', sans-serif",
+                  letterSpacing: '0.02em',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {formattedPrice}
+                <span style={{ 
+                  fontSize: '0.25em', 
+                  fontWeight: 500, 
+                  marginLeft: '4px', 
+                  verticalAlign: 'super',
+                }}>
+                  TND
+                </span>
+              </Typography>
+            </motion.div>
           </Box>
-
-          {/* Buy Now Button - Premium Action */}
-          <motion.div style={{ width: '100%' }}>
-            <Button
-              fullWidth
-              variant="contained"
-              size="small"
-              onClick={handleAddToCartClick}
-              disabled={!currentSize || currentSize.stock === 0}
-              sx={{
-                bgcolor: colors.accentGold,
-                color: colors.white,
-                borderRadius: '50px',
-                textTransform: 'uppercase',
-                fontWeight: 700,
-                fontSize: '0.75rem',
-                letterSpacing: '0.08em',
-                py: 0.9,
-                transition: 'all 0.4s cubic-bezier(0.23, 1, 0.320, 1)',
-                fontFamily: "'Montserrat', sans-serif",
-                border: `2px solid ${colors.accentGold}`,
-                position: 'relative',
-                overflow: 'hidden',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: '-100%',
-                  width: '100%',
-                  height: '100%',
-                  bgcolor: colors.navyLight,
-                  transition: 'left 0.4s ease',
-                  zIndex: -1,
-                },
-                '&:hover:not(.Mui-disabled)': {
-                  bgcolor: colors.navyLight,
-                  borderColor: colors.navyLight,
-                  color: colors.white,
-                  boxShadow: '0 8px 20px rgba(115, 167, 246, 0.25)',
-                  '&::before': {
-                    left: 0,
-                  },
-                },
-                '&.Mui-disabled': {
-                  bgcolor: alpha(colors.black, 0.25),
-                  color: colors.white,
-                  borderColor: alpha(colors.black, 0.25),
-                  cursor: 'not-allowed',
-                },
-              }}
-            >
-              Buy Now
-            </Button>
-          </motion.div>
         </CardContent>
       </Card>
     </motion.div>
@@ -692,7 +696,7 @@ const ProductSection = ({ title, category, viewAllPath, isLast = false }) => {
             '&:hover': {
               borderColor: colors.accentGold,
               bgcolor: colors.accentGold,
-              color: colors.navyDark,
+              color: colors.white,
             },
           }}
         >
