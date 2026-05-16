@@ -7,11 +7,16 @@
   to = "http://54.37.159.225:7000/api/:splat"
   status = 200
   force = true
+  headers = {X-From-Proxy = "Netlify"}
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[build.environment]
-  VITE_API_URL = "/api"
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
