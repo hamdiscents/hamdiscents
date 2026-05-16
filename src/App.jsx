@@ -38,7 +38,7 @@ function App() {
 
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
-
+        
         {/* Admin routes - nested under AdminLayout (using Outlet pattern) */}
         <Route path="/dashboard" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />

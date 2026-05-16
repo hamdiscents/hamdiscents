@@ -488,7 +488,7 @@ const Navbar = () => {
         </Container>
       </AppBar>
       
-      {/* Category Drawer */}
+      {/* Category Drawer r */}
       <Drawer
         anchor="left"
         open={categoryDrawerOpen}
