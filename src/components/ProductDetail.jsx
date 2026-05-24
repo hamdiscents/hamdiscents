@@ -67,7 +67,7 @@ const colors = {
 const ProductDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { addToCart } = useCart();
+  const { addToCart, SHIPPING_FEE, FREE_SHIPPING_THRESHOLD } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -160,6 +160,19 @@ const ProductDetail = () => {
     return errors;
   };
 
+  // Calculate shipping fee
+  const getShippingFee = () => {
+    const subtotal = selectedSize ? selectedSize.price * quantity : 0;
+    if (subtotal === 0) return 0;
+    return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
+  };
+
+  // Calculate total
+  const getTotal = () => {
+    const subtotal = selectedSize ? selectedSize.price * quantity : 0;
+    return subtotal + getShippingFee();
+  };
+
   const handlePlaceOrder = async () => {
     const errors = validateOrderForm();
     if (Object.keys(errors).length > 0) {
@@ -179,7 +192,8 @@ const ProductDetail = () => {
           image: product.mainImage
         }],
         customer: orderForm,
-        paymentMethod: 'cash_on_delivery'
+        paymentMethod: 'cash_on_delivery',
+        totalAmount: getTotal()
       };
 
       const response = await api.post('/orders', orderData);
@@ -253,6 +267,9 @@ const ProductDetail = () => {
 
   const stockStatus = getStockStatus();
   const genderColor = getGenderColor(product.gender);
+  const shippingFee = getShippingFee();
+  const total = getTotal();
+  const subtotal = selectedSize ? selectedSize.price * quantity : 0;
 
   return (
     <Box sx={{ bgcolor: colors.white, minHeight: '100vh', pt: 4, pb: 8 }}>
@@ -553,7 +570,7 @@ const ProductDetail = () => {
                     <Stack alignItems="center">
                       <LocalShipping sx={{ color: colors.accentGold, fontSize: 32 }} />
                       <Typography variant="caption" sx={{ textAlign: 'center', mt: 1, fontWeight: 600, fontFamily: "'Assistant', sans-serif", color: colors.navyDark }}>
-                        Free Shipping<br />Over 250 TND
+                        Free Shipping<br />Over {FREE_SHIPPING_THRESHOLD} TND
                       </Typography>
                     </Stack>
                   </Grid>
@@ -753,6 +770,37 @@ const ProductDetail = () => {
                   </Box>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
+                  {/* Price Breakdown */}
+                  <Paper sx={{ p: 2, mb: 2, bgcolor: alpha(colors.navyDark, 0.02), borderRadius: '12px' }}>
+                    <Stack spacing={1}>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: '#666' }}>
+                          Subtotal ({quantity} item{quantity > 1 ? 's' : ''})
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: colors.navyDark }}>
+                          {formatPrice(subtotal)} TND
+                        </Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: '#666' }}>
+                          Shipping
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: shippingFee === 0 ? colors.success : colors.navyDark }}>
+                          {shippingFee === 0 ? 'FREE' : `${formatPrice(shippingFee)} TND`}
+                        </Typography>
+                      </Stack>
+                      <Divider />
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700, fontFamily: "'Assistant', sans-serif", color: colors.navyDark }}>
+                          Total
+                        </Typography>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: colors.accentGold, fontFamily: "'Assistant', sans-serif" }}>
+                          {formatPrice(total)} TND
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  </Paper>
+                  
                   <Button
                     fullWidth
                     variant="contained"
@@ -773,8 +821,13 @@ const ProductDetail = () => {
                       transition: 'all 0.3s ease',
                     }}
                   >
-                    {submitting ? 'Placing Order...' : `Place Order - ${formatPrice(selectedSize?.price * quantity || 0)} TND`}
+                    {submitting ? 'Placing Order...' : `Place Order - ${formatPrice(total)} TND`}
                   </Button>
+                  {subtotal >= FREE_SHIPPING_THRESHOLD && (
+                    <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1, color: colors.success, fontFamily: "'Assistant', sans-serif" }}>
+                      🎉 Free shipping applied!
+                    </Typography>
+                  )}
                 </Grid>
               </Grid>
             </Paper>
@@ -814,10 +867,23 @@ const ProductDetail = () => {
                 </Typography>
               </Stack>
               <Divider sx={{ my: 1.5 }} />
+              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: '#666' }}>Subtotal</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: "'Assistant', sans-serif", color: colors.navyDark }}>
+                  {formatPrice(subtotal)} TND
+                </Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="body2" sx={{ fontFamily: "'Assistant', sans-serif", color: '#666' }}>Shipping</Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600, fontFamily: "'Assistant', sans-serif", color: shippingFee === 0 ? colors.success : colors.navyDark }}>
+                  {shippingFee === 0 ? 'FREE' : `${formatPrice(shippingFee)} TND`}
+                </Typography>
+              </Stack>
+              <Divider sx={{ my: 1.5 }} />
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body1" sx={{ fontWeight: 700, fontFamily: "'Assistant', sans-serif", color: colors.navyDark }}>Total</Typography>
                 <Typography variant="h6" sx={{ fontWeight: 800, color: colors.accentGold, fontFamily: "'Assistant', sans-serif" }}>
-                  {formatPrice(selectedSize?.price * quantity)} + 8 TND (Delivery)
+                  {formatPrice(total)} TND
                 </Typography>
               </Stack>
             </Paper>

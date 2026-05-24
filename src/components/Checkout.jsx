@@ -151,7 +151,6 @@ const Checkout = () => {
           address: `${formData.address}, ${formData.city}, ${formData.postalCode || ''}`,
         },
         subtotal: getCartSubtotal(),
-        shippingFee: getShippingFee(),
         totalAmount: getCartTotal(),
         paymentMethod: 'cash_on_delivery',
         notes: formData.orderNotes,
@@ -386,10 +385,10 @@ const Checkout = () => {
                       {getShippingFee() === 0 ? 'FREE' : `${getShippingFee()} TND`}
                     </Typography>
                   </Stack>
-                  {getCartSubtotal() < 150 && getCartSubtotal() > 0 && (
+                  {getCartSubtotal() < 2000 && getCartSubtotal() > 0 && (
                     <Alert severity="info" sx={{ borderRadius: '12px', py: 0.5 }}>
                       <Typography variant="caption">
-                        Add <strong>{150 - getCartSubtotal()} TND</strong> more for FREE shipping!
+                        Add <strong>{2000 - getCartSubtotal()} TND</strong> more for FREE shipping!
                       </Typography>
                     </Alert>
                   )}
