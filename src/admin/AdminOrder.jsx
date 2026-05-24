@@ -525,7 +525,7 @@ const AdminOrder = () => {
                 </TableCell>
                 <TableCell>
                   <Typography variant="body2" sx={{ fontWeight: 700, color: colors.primary }}>
-                    {formatCurrency(order.totalAmount)}
+                    {formatCurrency((order.totalAmount || 0) + 8)}
                   </Typography>
                 </TableCell>
                 <TableCell>
