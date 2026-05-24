@@ -687,7 +687,7 @@ const AdminOrder = () => {
                               <TableCell>{item.size}</TableCell>
                               <TableCell align="center">{item.quantity}</TableCell>
                               <TableCell align="right">{formatCurrency(item.price)}</TableCell>
-                              <TableCell align="right">{formatCurrency(item.price * item.quantity)}</TableCell>
+                              <TableCell align="right">{formatCurrency((item.price * item.quantity) + 8)}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -701,12 +701,12 @@ const AdminOrder = () => {
                       </Stack>
                       <Stack direction="row" justifyContent="space-between" sx={{ width: 250 }}>
                         <Typography variant="body2">Shipping:</Typography>
-                        <Typography variant="body2">{formatCurrency(selectedOrder.shippingFee || 0)}</Typography>
+                        <Typography variant="body2">{formatCurrency(selectedOrder.shippingFee || 8)}</Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between" sx={{ width: 250 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700 }}>Total:</Typography>
                         <Typography variant="h6" sx={{ fontWeight: 700, color: colors.accentGold }}>
-                          {formatCurrency(selectedOrder.totalAmount)}
+                          {formatCurrency((selectedOrder.totalAmount || 0) + 8)}
                         </Typography>
                       </Stack>
                     </Stack>
